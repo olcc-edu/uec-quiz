@@ -133,10 +133,10 @@ export const allSchools: string[] = schoolGroups.flatMap(g => g.schools);
 
 // Grade options
 export const gradeOptions = [
-  { value: '初一', label: '初一 (S1)' },
-  { value: '初二', label: '初二 (S2)' },
-  { value: '初三', label: '初三 (S3)' },
-  { value: '高一', label: '高一 (S4)' },
-  { value: '高二', label: '高二 (S5)' },
-  { value: '高三', label: '高三 (S6)' },
+  { value: '初一', label: '初一 (J1)' },
+  { value: '初二', label: '初二 (J2)' },
+  { value: '初三', label: '初三 (J3)' },
+  { value: '高一', label: '高一 (S1)' },
+  { value: '高二', label: '高二 (S2)' },
+  { value: '高三', label: '高三 (S3)' },
 ];
