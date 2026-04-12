@@ -76,9 +76,10 @@ export default function App() {
     // Load daily usage
     setDailyUsage(storage.getDailyUsage());
 
-    // Check URL params
+    // Check URL params - admin requires password
     const params = new URLSearchParams(window.location.search);
-    if (params.get('admin') === 'true') {
+    const adminKey = params.get('admin');
+    if (adminKey === 'uec2026admin') {
       setIsAdminMode(true);
     }
     const ref = params.get('ref');
