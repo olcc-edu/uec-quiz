@@ -1,7 +1,6 @@
 import { UserProfile } from '../types';
 
-// User will replace this with their deployed Apps Script URL
-const API_BASE = import.meta.env.VITE_API_URL || '';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://script.google.com/macros/s/AKfycbxPjmzY5Q5r8i_wyAgwVxw_t6ojBoWWaiccUlrmvobBpFsYWncCfjZW38UhJc5vwryr/exec';
 
 export const api = {
   async register(data: {
