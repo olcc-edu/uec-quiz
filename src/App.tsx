@@ -359,9 +359,9 @@ export default function App() {
 
       <PaywallModal show={showPaywall} onClose={() => setShowPaywall(false)} />
 
-      {/* 教材推荐 */}
+      {/* 首页底部按钮 */}
       {view === 'home' && (
-        <div className="max-w-4xl mx-auto px-4 pb-4">
+        <div className="max-w-4xl mx-auto px-4 pb-4 flex flex-col gap-3">
           <a
             href="https://olcc-edu.github.io/uec-quiz/"
             target="_blank"
@@ -369,6 +369,14 @@ export default function App() {
             className="block w-full text-center py-3 rounded-2xl border border-amber-200 bg-amber-50 text-amber-700 font-medium hover:bg-amber-100 transition-all text-sm"
           >
             📚 统考教材推荐
+          </a>
+          <a
+            href="https://wa.me/60165789873?text=%E4%BD%A0%E5%A5%BD%EF%BC%81%E6%88%91%E6%83%B3%E5%92%A8%E8%AF%A2%E5%85%B3%E4%BA%8E%20UEC%20%E5%88%B7%E9%A2%98%E5%AE%9D%E7%9A%84%E4%BF%A1%E6%81%AF%E3%80%82"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full text-center py-3 rounded-2xl border border-green-200 bg-green-50 text-green-700 font-medium hover:bg-green-100 transition-all text-sm"
+          >
+            💬 WhatsApp 联系我们
           </a>
         </div>
       )}
