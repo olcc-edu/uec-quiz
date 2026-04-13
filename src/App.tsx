@@ -359,6 +359,20 @@ export default function App() {
 
       <PaywallModal show={showPaywall} onClose={() => setShowPaywall(false)} />
 
+      {/* 教材推荐 */}
+      {view === 'home' && (
+        <div className="max-w-4xl mx-auto px-4 pb-4">
+          <a
+            href="https://olcc-edu.github.io/uec-quiz/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full text-center py-3 rounded-2xl border border-amber-200 bg-amber-50 text-amber-700 font-medium hover:bg-amber-100 transition-all text-sm"
+          >
+            📚 统考教材推荐
+          </a>
+        </div>
+      )}
+
       <footer className="max-w-4xl mx-auto px-4 py-8 text-center text-zinc-400 text-xs">
         <p>UEC 刷题宝 · 助力每一位统考学子</p>
       </footer>

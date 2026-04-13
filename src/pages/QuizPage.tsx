@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { XCircle, CheckCircle2, ArrowLeft, RotateCcw, Info } from 'lucide-react';
+import { XCircle, CheckCircle2, ArrowLeft, RotateCcw, Info, BookOpen } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -114,6 +114,19 @@ export function QuizPage({ questions, chapter, onFinish, onExit }: QuizPageProps
             >
               返回章节列表
             </button>
+          </div>
+
+          {/* 教材推荐 */}
+          <div className="mt-6 pt-6 border-t border-zinc-100">
+            <a
+              href="https://olcc-edu.github.io/uec-quiz/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-amber-200 bg-amber-50 text-amber-700 font-medium hover:bg-amber-100 transition-all text-sm"
+            >
+              <BookOpen size={18} />
+              📚 统考教材推荐
+            </a>
           </div>
         </div>
       </motion.div>
