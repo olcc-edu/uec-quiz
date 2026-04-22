@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Settings, LayoutGrid, Plus, RotateCcw, Trash2 } from 'lucide-react';
+import { Settings, LayoutGrid, Plus, RotateCcw, Trash2, QrCode } from 'lucide-react';
 import { Question } from '../types';
 import { ConfirmModal } from '../components/ConfirmModal';
 
@@ -14,6 +14,7 @@ interface AdminPageProps {
   onReset: () => void;
   onClear: () => void;
   onClose: () => void;
+  onOpenQrCode: () => void;
 }
 
 export function AdminPage({
@@ -26,6 +27,7 @@ export function AdminPage({
   onReset,
   onClear,
   onClose,
+  onOpenQrCode,
 }: AdminPageProps) {
   const [bulkData, setBulkData] = useState('');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -48,6 +50,13 @@ export function AdminPage({
       </div>
 
       <div className="space-y-6">
+        <button
+          onClick={onOpenQrCode}
+          className="w-full bg-purple-500 text-white py-4 rounded-2xl font-bold hover:bg-purple-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-200"
+        >
+          <QrCode size={20} /> QR Code 生成器（渠道追踪）
+        </button>
+
         <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100">
           <h3 className="font-bold text-emerald-800 mb-4 flex items-center gap-2">
             <LayoutGrid size={18} /> 远程 CSV 导入 (Google Sheets)

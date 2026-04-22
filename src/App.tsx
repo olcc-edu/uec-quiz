@@ -17,6 +17,7 @@ import { SubjectPage } from './pages/SubjectPage';
 import { ChapterPage } from './pages/ChapterPage';
 import { QuizPage } from './pages/QuizPage';
 import { AdminPage } from './pages/AdminPage';
+import { QrCodePage } from './pages/QrCodePage';
 
 const CURRENT_VERSION = '3';
 const DEFAULT_CSV_URL =
@@ -353,7 +354,12 @@ export default function App() {
               storage.setQuestions([]);
             }}
             onClose={() => setView('home')}
+            onOpenQrCode={() => setView('qrcode')}
           />
+        )}
+
+        {view === 'qrcode' && (
+          <QrCodePage onBack={() => setView('admin')} />
         )}
       </main>
 
