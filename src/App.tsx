@@ -377,6 +377,14 @@ export default function App() {
             📚 统考教材推荐
           </a>
           <a
+            href="https://yesteaching.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full text-center py-3 rounded-2xl border border-blue-200 bg-blue-50 text-blue-700 font-medium hover:bg-blue-100 transition-all text-sm"
+          >
+            🎓 家教配对网（YesTeaching）
+          </a>
+          <a
             href="https://wa.me/60165789873?text=%E4%BD%A0%E5%A5%BD%EF%BC%81%E6%88%91%E6%83%B3%E5%92%A8%E8%AF%A2%E5%85%B3%E4%BA%8E%20UEC%20%E5%88%B7%E9%A2%98%E5%AE%9D%E7%9A%84%E4%BF%A1%E6%81%AF%E3%80%82"
             target="_blank"
             rel="noopener noreferrer"
