@@ -50,14 +50,28 @@ export default function App() {
     const savedUser = storage.getUser();
     if (savedUser) {
       setUser(savedUser);
-      // Check paid status periodically
-      api.checkPaidStatus(savedUser.id).then((isPaid) => {
-        if (isPaid !== savedUser.isPaid) {
-          const updated = { ...savedUser, isPaid };
-          setUser(updated);
-          storage.setUser(updated);
-        }
-      });
+
+      // Auto-recover orphaned local users (those whose registration never reached the server)
+      if (savedUser.id.startsWith('local_')) {
+        api.recoverLocalUser(savedUser).then((recovered) => {
+          if (recovered) {
+            // Successfully migrated to server - replace local user with server user
+            // but preserve answer history (which is already in localStorage independently)
+            console.log('Account recovered to server:', recovered.id);
+            setUser(recovered);
+            storage.setUser(recovered);
+          }
+        });
+      } else {
+        // Normal server-side user: check paid status
+        api.checkPaidStatus(savedUser.id).then((isPaid) => {
+          if (isPaid !== savedUser.isPaid) {
+            const updated = { ...savedUser, isPaid };
+            setUser(updated);
+            storage.setUser(updated);
+          }
+        });
+      }
     } else {
       setView('register');
     }
