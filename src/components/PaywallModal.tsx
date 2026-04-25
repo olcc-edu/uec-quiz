@@ -1,14 +1,20 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { Lock, MessageCircle, X } from 'lucide-react';
+import { UserProfile } from '../types';
 
 interface PaywallModalProps {
   show: boolean;
+  user: UserProfile | null;
   onClose: () => void;
   whatsappNumber?: string;
 }
 
-export function PaywallModal({ show, onClose, whatsappNumber = '60165789873' }: PaywallModalProps) {
-  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('你好！我想解锁 UEC 刷题宝完整版。我的昵称是：')}`;
+export function PaywallModal({ show, user, onClose, whatsappNumber = '60165789873' }: PaywallModalProps) {
+  const accountInfo = user
+    ? `\n\n我的账号信息：\n昵称：${user.nickname}\n学校：${user.school}\n年级：${user.grade}\n账号 ID：${user.id}`
+    : '';
+  const message = `你好！我想解锁 UEC 刷题宝完整版。${accountInfo}`;
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
   return (
     <AnimatePresence>

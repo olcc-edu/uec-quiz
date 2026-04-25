@@ -1,14 +1,15 @@
-import { Settings, GraduationCap, User } from 'lucide-react';
-import { UserProfile, ViewType } from '../types';
+import { Settings, GraduationCap, User, ChevronDown } from 'lucide-react';
+import { UserProfile } from '../types';
 
 interface HeaderProps {
   user: UserProfile | null;
   isAdminMode: boolean;
   onNavigateHome: () => void;
   onNavigateAdmin: () => void;
+  onOpenAccount: () => void;
 }
 
-export function Header({ user, isAdminMode, onNavigateHome, onNavigateAdmin }: HeaderProps) {
+export function Header({ user, isAdminMode, onNavigateHome, onNavigateAdmin, onOpenAccount }: HeaderProps) {
   return (
     <header className="bg-white border-b border-zinc-200 sticky top-0 z-10">
       <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -24,10 +25,14 @@ export function Header({ user, isAdminMode, onNavigateHome, onNavigateAdmin }: H
 
         <div className="flex items-center gap-3">
           {user && (
-            <div className="flex items-center gap-1.5 text-xs text-zinc-400">
+            <button
+              onClick={onOpenAccount}
+              className="flex items-center gap-1 text-xs text-zinc-500 hover:text-emerald-600 hover:bg-emerald-50 px-2 py-1.5 rounded-lg transition-colors"
+            >
               <User size={14} />
-              <span>{user.nickname}</span>
-            </div>
+              <span className="font-medium">{user.nickname}</span>
+              <ChevronDown size={12} />
+            </button>
           )}
           {isAdminMode && (
             <button
