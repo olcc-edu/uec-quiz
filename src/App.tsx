@@ -396,14 +396,6 @@ export default function App() {
             📚 统考教材推荐
           </a>
           <a
-            href="https://yesteaching.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full text-center py-3 rounded-2xl border border-blue-200 bg-blue-50 text-blue-700 font-medium hover:bg-blue-100 transition-all text-sm"
-          >
-            🎓 家教配对网（YesTeaching）
-          </a>
-          <a
             href={`https://wa.me/60165789873?text=${encodeURIComponent(
               user
                 ? `你好！我想咨询关于 UEC 刷题宝。\n\n我的账号信息：\n昵称：${user.nickname}\n学校：${user.school}\n年级：${user.grade}\n账号 ID：${user.id}`
