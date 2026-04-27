@@ -105,11 +105,12 @@ export default function App() {
     }
   }, []);
 
-  // Auto-sync CSV on first load
+  // 静默后台同步题库（每次打开 app 时自动拉取最新题库）
   useEffect(() => {
-    if (csvUrl && questions.length <= initialQuestions.length && !isFetching && user) {
+    if (csvUrl && user && !isFetching) {
       handleCsvImport();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   // Derived data
