@@ -410,8 +410,13 @@ export default function App() {
         </div>
       )}
 
-      <footer className="max-w-4xl mx-auto px-4 py-8 text-center text-zinc-400 text-xs">
+      <footer className="max-w-4xl mx-auto px-4 py-6 text-center text-zinc-400 text-xs space-y-2">
         <p>UEC 刷题宝 · 助力每一位统考学子</p>
+        <p className="text-zinc-500">
+          本 app 由 <span className="font-bold text-emerald-600">毅而山教育中心</span> 赞助
+          <span className="mx-2 text-zinc-300">│</span>
+          补习咨询：<a href="https://wa.me/60107669167" target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:underline">010-7669167</a>
+        </p>
       </footer>
     </div>
   );

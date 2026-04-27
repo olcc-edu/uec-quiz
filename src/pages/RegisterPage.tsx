@@ -171,9 +171,15 @@ export function RegisterPage({ onRegistered }: RegisterPageProps) {
           </button>
         </form>
 
-        <p className="text-center text-xs text-zinc-300 mt-6">
-          UEC 刷题宝 · 助力每一位统考学子
-        </p>
+        <div className="text-center text-xs text-zinc-400 mt-6 space-y-1.5">
+          <p className="text-zinc-300">UEC 刷题宝 · 助力每一位统考学子</p>
+          <p>
+            本 app 由 <span className="font-bold text-emerald-600">毅而山教育中心</span> 赞助
+          </p>
+          <p>
+            补习咨询：<a href="https://wa.me/60107669167" target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:underline">010-7669167</a>
+          </p>
+        </div>
       </motion.div>
     </div>
   );
