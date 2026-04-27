@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { ArrowLeft, BookOpen, ChevronRight, Lock } from 'lucide-react';
+import { ArrowLeft, BookOpen, ChevronRight, Lock, Sparkles } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { Question, QuizResult } from '../types';
 
@@ -34,7 +34,9 @@ export function ChapterPage({
     if (chapterResults.length === 0) return null;
     const maxScore = Math.max(...chapterResults.map((h) => h.score));
     const total = chapterResults[0].total;
-    return { score: maxScore, total };
+    // 历史上学生做过的最大题数（用于检测新题）
+    const maxSeenTotal = Math.max(...chapterResults.map((h) => h.total));
+    return { score: maxScore, total, maxSeenTotal };
   };
 
   const handleChapterClick = (chapter: string) => {
@@ -69,6 +71,9 @@ export function ChapterPage({
           const isLocked = !canStartQuiz(chapterKey);
           const maxScore = getChapterMaxScore(chapter);
           const questionCount = questions.filter((q) => q.chapter === chapter && q.level === level && q.subject === subject).length;
+          // 检测新题：用户做过这章 + 当前题数大于历史最大题数
+          const newQuestionCount = maxScore ? questionCount - maxScore.maxSeenTotal : 0;
+          const hasNewQuestions = newQuestionCount > 0;
 
           return (
             <button
@@ -92,9 +97,17 @@ export function ChapterPage({
                 >
                   {isLocked ? <Lock size={18} /> : <BookOpen size={18} />}
                 </div>
-                <span className={cn('font-medium text-sm', isLocked ? 'text-zinc-400' : 'text-zinc-700')}>
-                  {chapter}
-                </span>
+                <div className="flex flex-col gap-0.5">
+                  <span className={cn('font-medium text-sm', isLocked ? 'text-zinc-400' : 'text-zinc-700')}>
+                    {chapter}
+                  </span>
+                  {hasNewQuestions && !isLocked && (
+                    <span className="text-[10px] font-bold text-amber-600 flex items-center gap-1">
+                      <Sparkles size={10} />
+                      新增 {newQuestionCount} 题
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 {maxScore && (
@@ -102,7 +115,12 @@ export function ChapterPage({
                     最高: {maxScore.score}/{maxScore.total}
                   </span>
                 )}
-                <span className="text-xs text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded">
+                <span className={cn(
+                  "text-xs px-2 py-0.5 rounded",
+                  hasNewQuestions
+                    ? "bg-amber-100 text-amber-700 font-bold"
+                    : "bg-zinc-100 text-zinc-400"
+                )}>
                   {questionCount} 题
                 </span>
                 <ChevronRight size={16} className={isLocked ? 'text-zinc-200' : 'text-zinc-300 group-hover:text-emerald-500'} />
