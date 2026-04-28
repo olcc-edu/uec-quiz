@@ -26,25 +26,28 @@ export function HolidayClassBanner({ onOpenDetails }: HolidayClassBannerProps) {
   if (dismissed) return null;
 
   return (
-    <motion.button
+    <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      onClick={onOpenDetails}
-      className="relative w-full text-left rounded-2xl overflow-hidden shadow-lg shadow-orange-200 mb-6 group"
+      className="relative w-full rounded-2xl overflow-hidden shadow-lg shadow-orange-200 mb-6 group"
       style={{
         background: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)',
       }}
     >
-      <div className="relative px-5 py-4 text-white">
-        {/* Dismiss */}
-        <button
-          onClick={handleDismiss}
-          className="absolute top-2 right-2 p-1 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-colors"
-          aria-label="关闭"
-        >
-          <X size={14} />
-        </button>
+      {/* Dismiss button - sibling, not nested */}
+      <button
+        onClick={handleDismiss}
+        className="absolute top-2 right-2 z-10 p-1 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+        aria-label="关闭"
+      >
+        <X size={14} />
+      </button>
 
+      {/* Main clickable area */}
+      <button
+        onClick={onOpenDetails}
+        className="w-full text-left px-5 py-4 text-white"
+      >
         <div className="flex items-center gap-3 pr-6">
           <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
             <Flame size={22} />
@@ -64,8 +67,8 @@ export function HolidayClassBanner({ onOpenDetails }: HolidayClassBannerProps) {
           </div>
           <ChevronRight size={18} className="text-white/70 group-hover:translate-x-1 transition-transform shrink-0" />
         </div>
-      </div>
-    </motion.button>
+      </button>
+    </motion.div>
   );
 }
 
