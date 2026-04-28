@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Flame, X, ChevronRight } from 'lucide-react';
+// X is still used in the modal close button below
 
-const STORAGE_KEY = 'uec_holiday_banner_dismissed';
 const WHATSAPP = '60165789873';
 const WHATSAPP_MSG = '你好！我想了解 5 月假期理科四剑客特攻班的详情。';
 
@@ -11,44 +10,18 @@ interface HolidayClassBannerProps {
 }
 
 export function HolidayClassBanner({ onOpenDetails }: HolidayClassBannerProps) {
-  const [dismissed, setDismissed] = useState(false);
-
-  useEffect(() => {
-    setDismissed(localStorage.getItem(STORAGE_KEY) === '1');
-  }, []);
-
-  const handleDismiss = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    localStorage.setItem(STORAGE_KEY, '1');
-    setDismissed(true);
-  };
-
-  if (dismissed) return null;
-
   return (
-    <motion.div
+    <motion.button
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative w-full rounded-2xl overflow-hidden shadow-lg shadow-orange-200 mb-6 group"
+      onClick={onOpenDetails}
+      className="relative w-full text-left rounded-2xl overflow-hidden shadow-lg shadow-orange-200 mb-6 group"
       style={{
         background: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)',
       }}
     >
-      {/* Dismiss button - sibling, not nested */}
-      <button
-        onClick={handleDismiss}
-        className="absolute top-2 right-2 z-10 p-1 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-colors"
-        aria-label="关闭"
-      >
-        <X size={14} />
-      </button>
-
-      {/* Main clickable area */}
-      <button
-        onClick={onOpenDetails}
-        className="w-full text-left px-5 py-4 text-white"
-      >
-        <div className="flex items-center gap-3 pr-6">
+      <div className="px-5 py-4 text-white">
+        <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
             <Flame size={22} />
           </div>
@@ -67,8 +40,8 @@ export function HolidayClassBanner({ onOpenDetails }: HolidayClassBannerProps) {
           </div>
           <ChevronRight size={18} className="text-white/70 group-hover:translate-x-1 transition-transform shrink-0" />
         </div>
-      </button>
-    </motion.div>
+      </div>
+    </motion.button>
   );
 }
 
