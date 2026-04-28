@@ -12,6 +12,7 @@ import { initialQuestions } from './data/questions';
 import { Header } from './components/Header';
 import { PaywallModal } from './components/PaywallModal';
 import { AccountModal } from './components/AccountModal';
+import { HolidayClassBanner, HolidayClassModal } from './components/HolidayClassBanner';
 import { RegisterPage } from './pages/RegisterPage';
 import { HomePage } from './pages/HomePage';
 import { SubjectPage } from './pages/SubjectPage';
@@ -37,6 +38,7 @@ export default function App() {
   const [dailyUsage, setDailyUsage] = useState<DailyUsage>({ date: '', chaptersUsed: [] });
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
+  const [showHolidayClass, setShowHolidayClass] = useState(false);
 
   // Admin state
   const [isAdminMode, setIsAdminMode] = useState(false);
@@ -307,20 +309,23 @@ export default function App() {
 
       <main className="max-w-4xl mx-auto px-4 py-6 pb-20">
         {view === 'home' && user && (
-          <HomePage
-            user={user}
-            questions={questions}
-            quizHistory={quizHistory}
-            isAdminMode={isAdminMode}
-            isFetching={isFetching}
-            dailyUsage={dailyUsage}
-            onSelectLevel={handleSelectLevel}
-            onCsvSync={handleCsvImport}
-            onClearHistory={() => {
-              setQuizHistory([]);
-              storage.clearHistory();
-            }}
-          />
+          <>
+            <HolidayClassBanner onOpenDetails={() => setShowHolidayClass(true)} />
+            <HomePage
+              user={user}
+              questions={questions}
+              quizHistory={quizHistory}
+              isAdminMode={isAdminMode}
+              isFetching={isFetching}
+              dailyUsage={dailyUsage}
+              onSelectLevel={handleSelectLevel}
+              onCsvSync={handleCsvImport}
+              onClearHistory={() => {
+                setQuizHistory([]);
+                storage.clearHistory();
+              }}
+            />
+          </>
         )}
 
         {view === 'subject' && selectedLevel && (
@@ -352,6 +357,7 @@ export default function App() {
             chapter={selectedChapter}
             onFinish={handleQuizFinish}
             onExit={() => setView('chapter')}
+            onOpenHolidayClass={() => setShowHolidayClass(true)}
           />
         )}
 
@@ -383,6 +389,7 @@ export default function App() {
 
       <PaywallModal show={showPaywall} user={user} onClose={() => setShowPaywall(false)} />
       <AccountModal show={showAccount} user={user} onClose={() => setShowAccount(false)} />
+      <HolidayClassModal show={showHolidayClass} onClose={() => setShowHolidayClass(false)} />
 
       {/* 首页底部按钮 */}
       {view === 'home' && (

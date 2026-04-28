@@ -9,6 +9,7 @@ import { Question } from '../types';
 import { cn } from '../utils/cn';
 import { ProgressBar } from '../components/ProgressBar';
 import { ConfirmModal } from '../components/ConfirmModal';
+import { HolidayClassResultCard } from '../components/HolidayClassBanner';
 
 const APPLAUSE_SOUND = 'https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3';
 const ERROR_SOUND = 'https://assets.mixkit.co/active_storage/sfx/2959/2959-preview.mp3';
@@ -18,9 +19,10 @@ interface QuizPageProps {
   chapter: string;
   onFinish: (score: number, total: number) => void;
   onExit: () => void;
+  onOpenHolidayClass?: () => void;
 }
 
-export function QuizPage({ questions, chapter, onFinish, onExit }: QuizPageProps) {
+export function QuizPage({ questions, chapter, onFinish, onExit, onOpenHolidayClass }: QuizPageProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [userAnswer, setUserAnswer] = useState<number | null>(null);
@@ -128,6 +130,11 @@ export function QuizPage({ questions, chapter, onFinish, onExit }: QuizPageProps
               📚 统考教材推荐
             </a>
           </div>
+
+          {/* 假期班推荐 */}
+          {onOpenHolidayClass && (
+            <HolidayClassResultCard onOpenDetails={onOpenHolidayClass} />
+          )}
         </div>
       </motion.div>
     );
