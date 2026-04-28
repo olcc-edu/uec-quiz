@@ -83,6 +83,25 @@ export function AccountModal({ show, user, onClose }: AccountModalProps) {
               />
             </div>
 
+            {/* 升级提示（仅对免费用户显示） */}
+            {!user.isPaid && (
+              <div className="mb-4 p-3 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold text-emerald-800">升级完整版</p>
+                    <p className="text-[10px] text-emerald-600 mt-0.5">无限刷题 · 解锁所有章节</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] text-zinc-400 line-through">RM 19.90</span>
+                    <div className="text-lg font-black text-emerald-600 leading-none">
+                      RM 9.90
+                    </div>
+                    <span className="text-[9px] text-amber-600 font-bold">首月特惠</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <button
                 onClick={handleCopy}
