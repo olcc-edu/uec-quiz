@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { BookOpen, LayoutGrid, CheckCircle2, RotateCcw, Crown } from 'lucide-react';
+import { BookOpen, LayoutGrid, CheckCircle2, RotateCcw, Crown, FileText, Sparkles, ChevronRight } from 'lucide-react';
 import { Question, QuizResult, UserProfile, DailyUsage } from '../types';
 import { cn } from '../utils/cn';
 import { ConfirmModal } from '../components/ConfirmModal';
@@ -15,6 +15,7 @@ interface HomePageProps {
   onSelectLevel: (level: 'Junior' | 'Senior') => void;
   onCsvSync: () => void;
   onClearHistory: () => void;
+  onOpenMockExam: () => void;
 }
 
 export function HomePage({
@@ -27,6 +28,7 @@ export function HomePage({
   onSelectLevel,
   onCsvSync,
   onClearHistory,
+  onOpenMockExam,
 }: HomePageProps) {
   const [showHistoryClear, setShowHistoryClear] = useState(false);
 
@@ -113,6 +115,31 @@ export function HomePage({
             <h3 className="text-2xl font-bold text-zinc-800">高中统考</h3>
             <p className="text-zinc-500 mt-1">Senior Middle Level</p>
           </div>
+        </div>
+      </button>
+
+      {/* 统考模拟卷入口（敬请期待） */}
+      <button
+        onClick={onOpenMockExam}
+        className="md:col-span-2 group relative overflow-hidden rounded-3xl border-2 border-dashed border-purple-300 bg-gradient-to-r from-purple-50 to-indigo-50 hover:border-purple-500 hover:shadow-md transition-all p-5 active:scale-[0.99]"
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-purple-200">
+            <FileText size={22} />
+          </div>
+          <div className="flex-1 text-left">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-base font-bold text-zinc-800">📝 统考模拟卷</h3>
+              <span className="inline-flex items-center gap-0.5 bg-amber-400 text-amber-900 px-1.5 py-0.5 rounded text-[9px] font-black">
+                <Sparkles size={9} />
+                敬请期待
+              </span>
+            </div>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              仿真统考真题难度 · 限时模拟考试体验
+            </p>
+          </div>
+          <ChevronRight size={18} className="text-purple-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
         </div>
       </button>
 

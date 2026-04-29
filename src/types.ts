@@ -35,4 +35,4 @@ export interface DailyUsage {
   chaptersUsed: string[]; // chapter keys like "Junior|科学|光学"
 }
 
-export type ViewType = 'register' | 'home' | 'subject' | 'chapter' | 'quiz' | 'admin' | 'qrcode';
+export type ViewType = 'register' | 'home' | 'subject' | 'chapter' | 'quiz' | 'admin' | 'qrcode' | 'mockexam';

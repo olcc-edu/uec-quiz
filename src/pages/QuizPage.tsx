@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { XCircle, CheckCircle2, ArrowLeft, RotateCcw, Info, BookOpen } from 'lucide-react';
+import { XCircle, CheckCircle2, ArrowLeft, RotateCcw, Info, BookOpen, Clock } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -29,6 +29,41 @@ export function QuizPage({ questions, chapter, onFinish, onExit, onOpenHolidayCl
   const [showExplanation, setShowExplanation] = useState(false);
   const [quizFinished, setQuizFinished] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
+
+  // 检测是否是模拟卷（章节名包含「模拟卷」或「卷」）
+  const isMockExam = useMemo(
+    () => /模拟卷|^卷\d+$/.test(chapter),
+    [chapter]
+  );
+  // 模拟卷计时：每题 1.5 分钟
+  const totalSeconds = useMemo(
+    () => (isMockExam ? questions.length * 90 : 0),
+    [isMockExam, questions.length]
+  );
+  const [timeLeft, setTimeLeft] = useState(totalSeconds);
+
+  // 倒计时
+  useEffect(() => {
+    if (!isMockExam || quizFinished || timeLeft <= 0) return;
+    const timer = setInterval(() => {
+      setTimeLeft((t) => {
+        if (t <= 1) {
+          clearInterval(timer);
+          setQuizFinished(true);
+          onFinish(score, questions.length);
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isMockExam, quizFinished, timeLeft, score, questions.length, onFinish]);
+
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60);
+    const ss = s % 60;
+    return `${m}:${ss.toString().padStart(2, '0')}`;
+  };
 
   const applauseAudio = useMemo(() => new Audio(APPLAUSE_SOUND), []);
   const errorAudio = useMemo(() => new Audio(ERROR_SOUND), []);
@@ -154,7 +189,20 @@ export function QuizPage({ questions, chapter, onFinish, onExit, onOpenHolidayCl
         >
           <XCircle size={14} /> 结束作答
         </button>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          {isMockExam && (
+            <span className={cn(
+              "inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold tabular-nums",
+              timeLeft <= 60
+                ? "bg-red-50 text-red-600 animate-pulse"
+                : timeLeft <= 300
+                ? "bg-amber-50 text-amber-600"
+                : "bg-purple-50 text-purple-600"
+            )}>
+              <Clock size={12} />
+              {formatTime(timeLeft)}
+            </span>
+          )}
           <span className="text-sm font-medium text-zinc-500">
             第 {currentIndex + 1} / {questions.length} 题
           </span>

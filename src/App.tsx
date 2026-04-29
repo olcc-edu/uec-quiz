@@ -20,6 +20,7 @@ import { ChapterPage } from './pages/ChapterPage';
 import { QuizPage } from './pages/QuizPage';
 import { AdminPage } from './pages/AdminPage';
 import { QrCodePage } from './pages/QrCodePage';
+import { MockExamPage } from './pages/MockExamPage';
 
 const CURRENT_VERSION = '3';
 const DEFAULT_CSV_URL =
@@ -324,8 +325,13 @@ export default function App() {
                 setQuizHistory([]);
                 storage.clearHistory();
               }}
+              onOpenMockExam={() => setView('mockexam')}
             />
           </>
+        )}
+
+        {view === 'mockexam' && (
+          <MockExamPage onBack={() => setView('home')} />
         )}
 
         {view === 'subject' && selectedLevel && (
