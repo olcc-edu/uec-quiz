@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Copy, Check, User, School, BookOpen, Phone, IdCard, MessageCircle } from 'lucide-react';
+import { X, Copy, Check, User, School, BookOpen, Phone, IdCard, MessageCircle, Lock, LogOut } from 'lucide-react';
 import { UserProfile } from '../types';
 
 interface AccountModalProps {
   show: boolean;
   user: UserProfile | null;
   onClose: () => void;
+  onChangePassword: () => void;
+  onLogout: () => void;
 }
 
-export function AccountModal({ show, user, onClose }: AccountModalProps) {
+export function AccountModal({ show, user, onClose, onChangePassword, onLogout }: AccountModalProps) {
   const [copied, setCopied] = useState(false);
 
   if (!user) return null;
@@ -125,6 +127,20 @@ export function AccountModal({ show, user, onClose }: AccountModalProps) {
               >
                 <MessageCircle size={18} /> WhatsApp 联系客服
               </a>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  onClick={onChangePassword}
+                  className="bg-zinc-50 text-zinc-600 py-2.5 rounded-xl text-sm font-medium hover:bg-zinc-100 border border-zinc-200 transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <Lock size={14} /> 修改密码
+                </button>
+                <button
+                  onClick={onLogout}
+                  className="bg-zinc-50 text-zinc-500 py-2.5 rounded-xl text-sm font-medium hover:bg-red-50 hover:text-red-500 border border-zinc-200 transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <LogOut size={14} /> 登出
+                </button>
+              </div>
             </div>
           </motion.div>
         </div>

@@ -25,9 +25,12 @@ export interface UserProfile {
   school: string;
   grade: string;
   whatsapp?: string;
+  phoneNormalized?: string;
   ref?: string; // channel tracking
   registeredAt: string;
   isPaid: boolean;
+  passwordChangeRequired?: boolean;
+  passwordNudgeDismissed?: boolean; // legacy users dismissed "建议设密码" toast
 }
 
 export interface DailyUsage {
@@ -35,4 +38,4 @@ export interface DailyUsage {
   chaptersUsed: string[]; // chapter keys like "Junior|科学|光学"
 }
 
-export type ViewType = 'register' | 'home' | 'subject' | 'chapter' | 'quiz' | 'admin' | 'qrcode' | 'mockexam';
+export type ViewType = 'login' | 'register' | 'home' | 'subject' | 'chapter' | 'quiz' | 'admin' | 'qrcode' | 'mockexam';

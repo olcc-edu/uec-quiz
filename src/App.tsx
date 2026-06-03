@@ -4,6 +4,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import Papa from 'papaparse';
+import { X, Lock } from 'lucide-react';
 // motion animations are handled within individual page components
 import { Question, QuizResult, UserProfile, ViewType, DailyUsage } from './types';
 import { storage } from './utils/storage';
@@ -12,7 +13,9 @@ import { initialQuestions } from './data/questions';
 import { Header } from './components/Header';
 import { PaywallModal } from './components/PaywallModal';
 import { AccountModal } from './components/AccountModal';
+import { ChangePasswordModal } from './components/ChangePasswordModal';
 import { HolidayClassBanner, HolidayClassModal } from './components/HolidayClassBanner';
+import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { HomePage } from './pages/HomePage';
 import { SubjectPage } from './pages/SubjectPage';
@@ -21,6 +24,8 @@ import { QuizPage } from './pages/QuizPage';
 import { AdminPage } from './pages/AdminPage';
 import { QrCodePage } from './pages/QrCodePage';
 import { MockExamPage } from './pages/MockExamPage';
+
+const NUDGE_KEY = 'uec_password_nudge_dismissed';
 
 const CURRENT_VERSION = '3';
 const DEFAULT_CSV_URL =
@@ -40,6 +45,9 @@ export default function App() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
   const [showHolidayClass, setShowHolidayClass] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [forcePasswordChange, setForcePasswordChange] = useState(false);
+  const [showPasswordNudge, setShowPasswordNudge] = useState(false);
 
   // Admin state
   const [isAdminMode, setIsAdminMode] = useState(false);
@@ -49,34 +57,12 @@ export default function App() {
 
   // Initialize
   useEffect(() => {
-    // Load user
     const savedUser = storage.getUser();
     if (savedUser) {
       setUser(savedUser);
-
-      // Auto-recover orphaned local users (those whose registration never reached the server)
-      if (savedUser.id.startsWith('local_')) {
-        api.recoverLocalUser(savedUser).then((recovered) => {
-          if (recovered) {
-            // Successfully migrated to server - replace local user with server user
-            // but preserve answer history (which is already in localStorage independently)
-            console.log('Account recovered to server:', recovered.id);
-            setUser(recovered);
-            storage.setUser(recovered);
-          }
-        });
-      } else {
-        // Normal server-side user: check paid status
-        api.checkPaidStatus(savedUser.id).then((isPaid) => {
-          if (isPaid !== savedUser.isPaid) {
-            const updated = { ...savedUser, isPaid };
-            setUser(updated);
-            storage.setUser(updated);
-          }
-        });
-      }
+      hydrateUserFromServer(savedUser);
     } else {
-      setView('register');
+      setView('login');
     }
 
     // Load questions
@@ -218,12 +204,81 @@ export default function App() {
     }
   }, [csvUrl]);
 
+  // Refresh server-side user fields + pull history. Show nudge if legacy account on default password.
+  const hydrateUserFromServer = useCallback(async (current: UserProfile) => {
+    if (current.id.startsWith('local_')) return;
+
+    const fresh = await api.refreshUser(current.id);
+    const merged: UserProfile = fresh ? { ...current, ...fresh } : current;
+    if (fresh) {
+      setUser(merged);
+      storage.setUser(merged);
+    }
+
+    const serverHist = await api.getHistory(current.id);
+    if (serverHist && serverHist.length > 0) {
+      const localHist = storage.getHistory();
+      const seen = new Set<string>();
+      const out: QuizResult[] = [];
+      for (const h of [...serverHist, ...localHist]) {
+        const key = `${h.date}|${h.subject}|${h.chapter}|${h.score}|${h.total}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(h);
+      }
+      out.sort((a, b) => (a.date < b.date ? 1 : -1));
+      const trimmed = out.slice(0, 50);
+      setQuizHistory(trimmed);
+      storage.setHistory(trimmed);
+    }
+
+    // Gentle nudge for legacy users sitting on default password
+    if (merged.passwordChangeRequired && localStorage.getItem(NUDGE_KEY) !== 'true') {
+      setShowPasswordNudge(true);
+    }
+  }, []);
+
   // Handlers
+  const handleLoggedIn = (newUser: UserProfile) => {
+    setUser(newUser);
+    setView('home');
+    if (newUser.passwordChangeRequired) {
+      setForcePasswordChange(true);
+      setShowChangePassword(true);
+    }
+    hydrateUserFromServer(newUser);
+    handleCsvImport();
+  };
+
   const handleRegistered = (newUser: UserProfile) => {
     setUser(newUser);
     setView('home');
-    // Trigger CSV sync after registration
+    // Brand new user chose own password — no nudge needed
+    localStorage.setItem(NUDGE_KEY, 'true');
     handleCsvImport();
+  };
+
+  const handleLogout = () => {
+    storage.clearUser();
+    storage.clearHistory();
+    localStorage.removeItem(NUDGE_KEY);
+    setUser(null);
+    setQuizHistory([]);
+    setShowAccount(false);
+    setView('login');
+  };
+
+  const handlePasswordChanged = (updated: UserProfile) => {
+    setUser(updated);
+    setForcePasswordChange(false);
+    setShowChangePassword(false);
+    localStorage.setItem(NUDGE_KEY, 'true');
+    setShowPasswordNudge(false);
+  };
+
+  const handleDismissNudge = () => {
+    localStorage.setItem(NUDGE_KEY, 'true');
+    setShowPasswordNudge(false);
   };
 
   const handleSelectLevel = (level: 'Junior' | 'Senior') => {
@@ -257,11 +312,14 @@ export default function App() {
       chapter: selectedChapter || '',
       score,
       total,
-      date: new Date().toLocaleString(),
+      date: new Date().toISOString(),
     };
     const updated = [newResult, ...quizHistory].slice(0, 50);
     setQuizHistory(updated);
     storage.setHistory(updated);
+    if (user) {
+      api.saveHistory(user.id, newResult);
+    }
   };
 
   const handleBulkImport = (data: string) => {
@@ -293,9 +351,12 @@ export default function App() {
     setSelectedChapter(null);
   };
 
-  // Register page (no header)
+  // Auth views (no header)
+  if (view === 'login') {
+    return <LoginPage onLoggedIn={handleLoggedIn} onGoRegister={() => setView('register')} />;
+  }
   if (view === 'register') {
-    return <RegisterPage onRegistered={handleRegistered} />;
+    return <RegisterPage onRegistered={handleRegistered} onGoLogin={() => setView('login')} />;
   }
 
   return (
@@ -394,8 +455,52 @@ export default function App() {
       </main>
 
       <PaywallModal show={showPaywall} user={user} onClose={() => setShowPaywall(false)} />
-      <AccountModal show={showAccount} user={user} onClose={() => setShowAccount(false)} />
+      <AccountModal
+        show={showAccount}
+        user={user}
+        onClose={() => setShowAccount(false)}
+        onChangePassword={() => {
+          setShowAccount(false);
+          setForcePasswordChange(false);
+          setShowChangePassword(true);
+        }}
+        onLogout={handleLogout}
+      />
+      <ChangePasswordModal
+        show={showChangePassword}
+        user={user}
+        forced={forcePasswordChange}
+        onClose={() => setShowChangePassword(false)}
+        onChanged={handlePasswordChanged}
+      />
       <HolidayClassModal show={showHolidayClass} onClose={() => setShowHolidayClass(false)} />
+
+      {/* 友善提示：建议设密码（旧用户） */}
+      {showPasswordNudge && view === 'home' && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 max-w-md w-[calc(100%-2rem)] z-50">
+          <div className="bg-amber-50 border border-amber-300 rounded-2xl shadow-lg px-4 py-3 flex items-center gap-3">
+            <div className="w-9 h-9 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center shrink-0">
+              <Lock size={18} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-zinc-800">建议设置密码</p>
+              <p className="text-[11px] text-zinc-500">默认密码 1234，改一个只有你知道的</p>
+            </div>
+            <button
+              onClick={() => {
+                setForcePasswordChange(false);
+                setShowChangePassword(true);
+              }}
+              className="bg-amber-500 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-amber-600 shrink-0"
+            >
+              立即设置
+            </button>
+            <button onClick={handleDismissNudge} className="text-zinc-400 hover:text-zinc-600 shrink-0">
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 首页底部按钮 */}
       {view === 'home' && (
