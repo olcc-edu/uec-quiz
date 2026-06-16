@@ -87,6 +87,7 @@ export default function App() {
     const adminKey = params.get('admin');
     if (adminKey === 'uec2026admin') {
       setIsAdminMode(true);
+      setView('admin');
     }
     const ref = params.get('ref');
     if (ref) {
