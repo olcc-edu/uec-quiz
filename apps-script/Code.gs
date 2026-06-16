@@ -19,7 +19,8 @@
  */
 
 // ===== 配置 =====
-const SHEET_ID = 'YOUR_GOOGLE_SHEET_ID_HERE'; // 替换为你的 Google Sheets ID
+// SHEET_ID 从 ScriptProperties 读取（旧代码已经设好，无需手动填）
+const SHEET_ID = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
 const ADMIN_PASSWORD = 'uec2026admin';
 
 // 列索引（1-based）
@@ -430,6 +431,45 @@ function normalizePhone_(raw) {
   if (s.startsWith('1') && s.length >= 9 && s.length <= 10) s = '60' + s;
   if (!/^601\d{8,9}$/.test(s)) return '';
   return s;
+}
+
+/**
+ * 管理员重置密码工具
+ *
+ * 用法：在 Apps Script 编辑器里直接改下面这行的 userId / phone，
+ * 然后选中函数 resetPasswordByUserId 或 resetPasswordByPhone → 点 ▶ 运行
+ * 重置完成后该用户密码 = 1234，首次登录会被强制改密。
+ */
+function resetPasswordByUserId() {
+  const userId = 'u_REPLACE_ME';  // ← 把这个改成要重置的 UserID
+  _resetPasswordTo1234_({ userId: userId });
+}
+
+function resetPasswordByPhone() {
+  const phone = '0123456789';     // ← 把这个改成要重置的 WhatsApp 号码
+  _resetPasswordTo1234_({ phone: phone });
+}
+
+function _resetPasswordTo1234_(opts) {
+  const sheet = getOrCreateUserSheet_();
+  let row = null;
+  if (opts.userId) {
+    row = findRowByUserId_(sheet, opts.userId);
+  } else if (opts.phone) {
+    const normalized = normalizePhone_(opts.phone);
+    if (!normalized) throw new Error('手机号格式无效：' + opts.phone);
+    row = findRowByPhone_(sheet, normalized);
+  }
+  if (!row) throw new Error('找不到用户：' + JSON.stringify(opts));
+
+  const salt = Utilities.getUuid();
+  const hash = hashPassword_('1234', salt);
+  sheet.getRange(row.rowIdx, COL.PASSWORD_HASH).setValue(hash);
+  sheet.getRange(row.rowIdx, COL.PASSWORD_SALT).setValue(salt);
+  sheet.getRange(row.rowIdx, COL.MUST_CHANGE).setValue('TRUE');
+
+  Logger.log('✅ 已重置 ' + String(row.values[COL.USER_ID - 1])
+    + '（' + String(row.values[COL.NICKNAME - 1]) + '）的密码为 1234');
 }
 
 function hashPassword_(password, salt) {

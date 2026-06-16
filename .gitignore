@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# clasp local config (contains script ID, machine-specific)
+apps-script/.clasp.json

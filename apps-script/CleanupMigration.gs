@@ -18,9 +18,7 @@
  *  - 同时建立「答题历史」表（如果还没有）
  */
 
-// 复用 Code.gs 里的 SHEET_ID（如果你把这段贴到同一个项目里就不用再写）
-// 如果你单独建项目，取消下面这行注释并填你的 Sheet ID：
-// const SHEET_ID = 'YOUR_GOOGLE_SHEET_ID_HERE';
+// SHEET_ID 复用 Code.gs 里定义的（从 ScriptProperties 读取）
 
 // ===== 配置 =====
 const DEFAULT_PASSWORD = '1234';
