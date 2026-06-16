@@ -92,6 +92,9 @@ function route_(e) {
       case 'activate':
         result = activateUser(data);
         break;
+      case 'adminResetPassword':
+        result = adminResetPassword(data);
+        break;
       case 'getStats':
         result = getStats(data.password);
         break;
@@ -291,6 +294,44 @@ function getHistory(userId) {
   // 最近 50 条
   out.sort((a, b) => (a.date < b.date ? 1 : -1));
   return { success: true, history: out.slice(0, 50) };
+}
+
+// ===== 管理员重置用户密码（密码归零成 1234，首次登录强制改密）=====
+
+function adminResetPassword(data) {
+  if (data.password !== ADMIN_PASSWORD) {
+    return { success: false, error: '管理员密码错误' };
+  }
+  const query = String(data.query || '').trim();
+  if (!query) return { success: false, error: '请输入 UserID 或手机号' };
+
+  const sheet = getOrCreateUserSheet_();
+  let row = null;
+  if (query.indexOf('u_') === 0) {
+    row = findRowByUserId_(sheet, query);
+  } else {
+    const normalized = normalizePhone_(query);
+    if (!normalized) {
+      return { success: false, error: '手机号格式无效，或请用 u_ 开头的 UserID' };
+    }
+    row = findRowByPhone_(sheet, normalized);
+  }
+  if (!row) return { success: false, error: '找不到该用户' };
+
+  const salt = Utilities.getUuid();
+  const hash = hashPassword_('1234', salt);
+  sheet.getRange(row.rowIdx, COL.PASSWORD_HASH).setValue(hash);
+  sheet.getRange(row.rowIdx, COL.PASSWORD_SALT).setValue(salt);
+  sheet.getRange(row.rowIdx, COL.MUST_CHANGE).setValue('TRUE');
+
+  return {
+    success: true,
+    user: {
+      id: String(row.values[COL.USER_ID - 1] || ''),
+      nickname: String(row.values[COL.NICKNAME - 1] || ''),
+      phoneNormalized: String(row.values[COL.PHONE_NORM - 1] || ''),
+    },
+  };
 }
 
 // ===== 管理员激活付费 =====

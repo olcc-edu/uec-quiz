@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Settings, LayoutGrid, Plus, RotateCcw, Trash2, QrCode } from 'lucide-react';
+import { Settings, LayoutGrid, Plus, RotateCcw, Trash2, QrCode, KeyRound } from 'lucide-react';
 import { Question } from '../types';
 import { ConfirmModal } from '../components/ConfirmModal';
+import { api } from '../utils/api';
 
 interface AdminPageProps {
   questions: Question[];
@@ -32,6 +33,27 @@ export function AdminPage({
   const [bulkData, setBulkData] = useState('');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [resetQuery, setResetQuery] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetResult, setResetResult] = useState<{ ok: boolean; msg: string } | null>(null);
+
+  const handleResetPassword = async () => {
+    const query = resetQuery.trim();
+    if (!query) return;
+    setResetLoading(true);
+    setResetResult(null);
+    const res = await api.adminResetPassword('uec2026admin', query);
+    setResetLoading(false);
+    if (res.user) {
+      setResetResult({
+        ok: true,
+        msg: `✅ 已重置 ${res.user.nickname || res.user.id} 的密码为 1234。让 TA 用「${res.user.phoneNormalized || res.user.id} + 1234」登录，会被强制改新密码。`,
+      });
+      setResetQuery('');
+    } else {
+      setResetResult({ ok: false, msg: `❌ ${res.error}` });
+    }
+  };
 
   return (
     <motion.div
@@ -56,6 +78,42 @@ export function AdminPage({
         >
           <QrCode size={20} /> QR Code 生成器（渠道追踪）
         </button>
+
+        <div className="bg-amber-50 p-5 rounded-2xl border border-amber-200">
+          <h3 className="font-bold text-amber-900 mb-3 flex items-center gap-2">
+            <KeyRound size={18} /> 重置用户密码
+          </h3>
+          <p className="text-xs text-amber-800/80 mb-3 leading-relaxed">
+            学生忘记密码时用这个。输入 WhatsApp 号码 或 UserID（u_ 开头），点重置 → 密码归零成 1234，对方登录后会被强制改新密码。
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={resetQuery}
+              onChange={(e) => setResetQuery(e.target.value)}
+              placeholder="0123456789 或 u_xxxxxxxxxxxx"
+              className="flex-1 p-3 bg-white border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none text-sm"
+            />
+            <button
+              onClick={handleResetPassword}
+              disabled={resetLoading || !resetQuery.trim()}
+              className="px-5 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 disabled:opacity-50 transition-all text-sm whitespace-nowrap"
+            >
+              {resetLoading ? '处理中...' : '重置为 1234'}
+            </button>
+          </div>
+          {resetResult && (
+            <div
+              className={`mt-3 p-3 rounded-xl text-sm ${
+                resetResult.ok
+                  ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                  : 'bg-red-50 border border-red-200 text-red-700'
+              }`}
+            >
+              {resetResult.msg}
+            </div>
+          )}
+        </div>
 
         <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100">
           <h3 className="font-bold text-emerald-800 mb-4 flex items-center gap-2">

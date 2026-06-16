@@ -143,6 +143,22 @@ export const api = {
     }
   },
 
+  async adminResetPassword(
+    adminPassword: string,
+    query: string,
+  ): Promise<{ user?: { id: string; nickname: string; phoneNormalized: string }; error?: string }> {
+    try {
+      const result = await callApi('adminResetPassword', {
+        password: adminPassword,
+        query,
+      });
+      if (result.success) return { user: result.user };
+      return { error: result.error || '重置失败' };
+    } catch (err) {
+      return { error: '网络错误，请稍后重试' };
+    }
+  },
+
   async getHistory(userId: string): Promise<QuizResult[] | null> {
     if (!userId || userId.startsWith('local_')) return null;
     try {
